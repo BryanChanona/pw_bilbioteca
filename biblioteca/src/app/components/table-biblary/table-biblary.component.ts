@@ -1,73 +1,73 @@
-import { Component } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';  // Importar el módulo de tabla
-import { MatDialogModule } from '@angular/material/dialog';  // Importar el módulo de diálogo
-import { MatSnackBarModule } from '@angular/material/snack-bar';  // Importar el módulo de snack-bar
-import { MatDialog } from '@angular/material/dialog';  // Para abrir diálogos
-import { MatSnackBar } from '@angular/material/snack-bar';  // Para mostrar mensajes de notificación
-import { EditBookDialogComponent } from '../edit-book-dialog/edit-book-dialog.component';  // Importar el componente del diálogo
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-  { position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-  { position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-  { position: 5, name: 'Boron', weight: 10.811, symbol: 'B' },
-  { position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C' },
-  { position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N' },
-  { position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O' },
-  { position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F' },
-  { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' },
-];
+import { Component, OnInit } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { EditBookDialogComponent } from '../edit-book-dialog/edit-book-dialog.component';
+import { Ibook } from '../../interfaces/book.model';
+import { BookService } from '../../service/book.service';
 
 @Component({
   selector: 'app-table-biblary',
   standalone: true,
-  imports: [MatTableModule, MatDialogModule, MatSnackBarModule],  // Importar los módulos de tabla, diálogo y snack-bar
+  imports: [MatTableModule, MatDialogModule, MatSnackBarModule],
   templateUrl: './table-biblary.component.html',
   styleUrls: ['./table-biblary.component.scss']
 })
-export class TableBiblaryComponent {
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol', 'actions'];
-  dataSource = ELEMENT_DATA;
+export class TableBiblaryComponent implements OnInit {
+  books: Ibook[] = [];
+  displayedColumns: string[] = [ 'title', 'description', 'publishedDate', 'actions'];
+  dataSource = this.books;
 
-  constructor(private dialog: MatDialog, private snackBar: MatSnackBar) {}
+  constructor(private dialog: MatDialog, private snackBar: MatSnackBar, private service: BookService) {}
 
-  // Función para abrir el diálogo de edición
-  onEdit(element: PeriodicElement): void {
+  ngOnInit(): void {
+    this.loadBooks();
+  }
+
+  loadBooks(): void {
+    this.service.getBooks().subscribe({
+      next: (books) => {
+      
+        this.books = books;
+        this.dataSource = [...this.books];  // Crear una copia para asegurar la actualización en MatTable
+      },
+      error: (error) => {
+        console.error('Error al cargar los libros:', error);
+      }
+    });
+  }
+
+  onEdit(element: Ibook): void {
     const dialogRef = this.dialog.open(EditBookDialogComponent, {
       width: '400px',
-      data: { 
-        title: element.name, 
-        description: element.symbol, 
-        publishedDate: '' 
+      height:'450px',
+      data: {
+        title: element.title,
+        description: element.description,
+        publishedDate: element.publishedDate
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Actualizar datos del libro
-        element.name = result.title;
-        element.symbol = result.description;
+        element.title = result.title;
+        element.description = result.description;
+        element.publishedDate = result.publishedDate;
         this.snackBar.open('Book updated successfully!', '', { duration: 2000 });
+        this.dataSource = [...this.books];  // Refresca la tabla tras la edición
       }
     });
   }
 
-  // Función para eliminar un libro
-  onDelete(element: PeriodicElement): void {
-    const confirmDelete = confirm(`Are you sure you want to delete ${element.name}?`);
+  onDelete(element: Ibook): void {
+    const confirmDelete = confirm(`Are you sure you want to delete ${element.title}?`);
     if (confirmDelete) {
-      // Eliminar libro
-      const index = this.dataSource.indexOf(element);
+      const index = this.books.indexOf(element);
       if (index > -1) {
-        this.dataSource.splice(index, 1);
+        this.books.splice(index, 1);  // Eliminar de `books`
+        this.dataSource = [...this.books];  // Actualizar la fuente de datos
         this.snackBar.open('Book deleted successfully!', '', { duration: 2000 });
       }
     }
