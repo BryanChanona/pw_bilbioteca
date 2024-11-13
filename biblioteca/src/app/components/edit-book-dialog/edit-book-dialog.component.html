@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Edit Book</h2>
+<form [formGroup]="editBookForm">
+  <mat-form-field appearance="fill">
+    <mat-label>Title</mat-label>
+    <input matInput formControlName="title" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="description" required></textarea>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Published Date</mat-label>
+    <input matInput formControlName="publishedDate" type="date" required />
+  </mat-form-field>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button color="primary" (click)="onSave()" [disabled]="!editBookForm.valid">Save</button>
+  </div>
+</form>
