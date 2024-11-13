@@ -1,11 +1,10 @@
-.contentForm {
+.contentForm{
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh; /* Para centrarlo verticalmente en la pantalla */
-  }
-  
-  .example-container {
+}
+.example-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -16,9 +15,12 @@
     padding-bottom: 120px;
     width: 300px;
   }
-.example-container mat-form-field {
+  .example-container mat-form-field {
     width: 300px;
 }
+
+
+
 button {
     align-items: center;
     background-image: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb);

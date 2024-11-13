@@ -1,1 +1,19 @@
-<p>login-form works!</p>
+<div class="contentForm">
+    <div class="example-container">
+        <mat-form-field class="matForm">
+            <mat-label>Enter your email</mat-label>
+            <input matInput placeholder="pat@example.com" [formControl]="email" (blur)="updateErrorMessage()"
+                required />
+            <mat-error *ngIf="email.invalid">{{ errorMessage() }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Enter your password</mat-label>
+            <input matInput placeholder="******" type="password" (blur)="updateErrorMessage()" required />
+            <mat-error></mat-error>
+        </mat-form-field>
+        <button>
+            <span class="text">Login</span>
+          </button>
+    </div>
+</div>
